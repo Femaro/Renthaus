@@ -1,0 +1,145 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
+import { doc, getDoc } from 'firebase/firestore'
+import { db } from '@/lib/firebase/config'
+import { Order } from '@/lib/firebase/types'
+import Card from '@/components/ui/Card'
+import Button from '@/components/ui/Button'
+import { formatCurrency } from '@/lib/utils'
+import { useAuth } from '@/contexts/AuthContext'
+import { Shield, CreditCard } from 'lucide-react'
+import toast from 'react-hot-toast'
+
+export default function PaymentPage() {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const { userData } = useAuth()
+  const [order, setOrder] = useState<Order | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [processing, setProcessing] = useState(false)
+
+  useEffect(() => {
+    const orderId = searchParams?.get('orderId')
+    if (orderId) {
+      loadOrder(orderId)
+    }
+  }, [searchParams])
+
+  const loadOrder = async (orderId: string) => {
+    try {
+      const docRef = doc(db, 'orders', orderId)
+      const docSnap = await getDoc(docRef)
+      if (docSnap.exists()) {
+        setOrder({ id: docSnap.id, ...docSnap.data() } as Order)
+      }
+    } catch (error) {
+      console.error('Error loading order:', error)
+      toast.error('Failed to load order')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handlePayment = async () => {
+    if (!order || !userData) return
+
+    setProcessing(true)
+
+    try {
+      const response = await fetch('/api/payment/paystack', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          orderId: order.id,
+          amount: order.totalAmount,
+          email: userData.email,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (data.authorizationUrl) {
+        // Redirect to Paystack payment page
+        window.location.href = data.authorizationUrl
+      } else {
+        toast.error('Failed to initialize payment')
+      }
+    } catch (error) {
+      console.error('Error processing payment:', error)
+      toast.error('Failed to process payment')
+    } finally {
+      setProcessing(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-black via-secondary to-black flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    )
+  }
+
+  if (!order) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-black via-secondary to-black flex items-center justify-center">
+        <div className="text-white">Order not found</div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-black via-secondary to-black p-8">
+      <div className="max-w-2xl mx-auto">
+        <h1 className="text-4xl font-bold text-white mb-8">Complete Payment</h1>
+
+        <Card variant="glass-red" className="p-8 mb-6">
+          <div className="flex items-center gap-3 mb-6">
+            <Shield className="text-primary" size={32} />
+            <h2 className="text-2xl font-bold text-white">Secure Payment</h2>
+          </div>
+          <p className="text-gray-300 mb-6">
+            Your payment is secured by Paystack. The security deposit will be held in escrow until the rental is completed.
+          </p>
+        </Card>
+
+        <Card variant="glass" className="p-8 mb-6">
+          <h3 className="text-xl font-bold text-white mb-4">Order Summary</h3>
+          <div className="space-y-3 mb-6">
+            <div className="flex justify-between">
+              <span className="text-gray-300">Product</span>
+              <span className="text-white font-semibold">{order.productTitle}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-300">Rental Fee</span>
+              <span className="text-white">{formatCurrency(order.rentalFee)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-300">Security Deposit</span>
+              <span className="text-white">{formatCurrency(order.securityDeposit)}</span>
+            </div>
+            <div className="border-t border-white/20 pt-3 flex justify-between">
+              <span className="text-xl font-bold text-white">Total</span>
+              <span className="text-2xl font-bold text-primary">{formatCurrency(order.totalAmount)}</span>
+            </div>
+          </div>
+        </Card>
+
+        <Button
+          onClick={handlePayment}
+          className="w-full"
+          size="lg"
+          disabled={processing}
+        >
+          <CreditCard className="mr-2" size={20} />
+          {processing ? 'Processing...' : 'Pay with Paystack'}
+        </Button>
+      </div>
+    </div>
+  )
+}
+
