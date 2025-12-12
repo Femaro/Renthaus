@@ -9,6 +9,7 @@ import Button from '@/components/ui/Button'
 import { formatCurrency } from '@/lib/utils'
 import { X, Star, Shield } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function ComparePage() {
   const [products, setProducts] = useState<(Product & { id: string })[]>([])
@@ -51,9 +52,9 @@ export default function ComparePage() {
   if (products.length === 0) {
     return (
       <div>
-        <h1 className="text-4xl font-bold text-white mb-8">Compare Products</h1>
-        <Card variant="glass" className="text-center py-12">
-          <p className="text-gray-300 text-xl mb-4">No products to compare</p>
+        <h1 className="text-4xl font-semibold text-gray-900 mb-8">Compare Products</h1>
+        <Card variant="default" className="text-center py-12">
+          <p className="text-gray-600 text-xl mb-4">No products to compare</p>
           <Link href="/search">
             <Button>Browse Products</Button>
           </Link>
@@ -71,31 +72,34 @@ export default function ComparePage() {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold text-white mb-8">Compare Products</h1>
+      <h1 className="text-4xl font-semibold text-gray-900 mb-8">Compare Products</h1>
       <div className="overflow-x-auto">
         <div className="inline-block min-w-full">
-          <table className="w-full">
-            <thead>
+          <table className="w-full bg-white rounded-xl overflow-hidden shadow-modern">
+            <thead className="bg-gray-50">
               <tr>
-                <th className="text-left p-4 text-white font-semibold">Feature</th>
+                <th className="text-left p-4 text-gray-700 font-semibold">Feature</th>
                 {products.map((product) => (
                   <th key={product.id} className="text-center p-4 min-w-[300px]">
-                    <Card variant="glass" className="p-4 relative">
+                    <Card variant="default" className="p-4 relative">
                       <button
                         onClick={() => removeProduct(product.id)}
-                        className="absolute top-2 right-2 text-gray-400 hover:text-red-400"
+                        className="absolute top-2 right-2 text-gray-400 hover:text-red-600"
                       >
                         <X size={20} />
                       </button>
-                      {product.images && product.images.length > 0 && (
-                        <img
-                          src={product.images[0]}
-                          alt={product.title}
-                          className="w-full h-32 object-cover rounded-xl mb-3"
-                        />
-                      )}
-                      <h3 className="text-lg font-bold text-white mb-2">{product.title}</h3>
-                      <p className="text-2xl font-bold text-primary mb-4">
+                      {product.images && product.images.length > 0 ? (
+                        <div className="relative h-32 mb-3 rounded-xl overflow-hidden">
+                          <Image
+                            src={product.images[0]}
+                            alt={product.title}
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
+                      ) : null}
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{product.title}</h3>
+                      <p className="text-2xl font-semibold text-primary mb-4">
                         {formatCurrency(product.dailyPrice)}
                       </p>
                       <Link href={`/products/${product.id}`}>
@@ -107,43 +111,43 @@ export default function ComparePage() {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td className="p-4 text-gray-300 font-medium">Price (Daily)</td>
+              <tr className="border-b border-gray-100">
+                <td className="p-4 text-gray-600 font-medium">Price (Daily)</td>
                 {products.map((product) => (
-                  <td key={product.id} className="p-4 text-center text-white font-semibold">
+                  <td key={product.id} className="p-4 text-center text-gray-900 font-semibold">
                     {formatCurrency(product.dailyPrice)}
                   </td>
                 ))}
               </tr>
-              <tr>
-                <td className="p-4 text-gray-300 font-medium">Security Deposit</td>
+              <tr className="border-b border-gray-100">
+                <td className="p-4 text-gray-600 font-medium">Security Deposit</td>
                 {products.map((product) => (
-                  <td key={product.id} className="p-4 text-center text-white">
+                  <td key={product.id} className="p-4 text-center text-gray-900">
                     {formatCurrency(product.securityDeposit)}
                   </td>
                 ))}
               </tr>
-              <tr>
-                <td className="p-4 text-gray-300 font-medium">Location</td>
+              <tr className="border-b border-gray-100">
+                <td className="p-4 text-gray-600 font-medium">Location</td>
                 {products.map((product) => (
-                  <td key={product.id} className="p-4 text-center text-white">
+                  <td key={product.id} className="p-4 text-center text-gray-900">
                     {product.city}, {product.state}
                   </td>
                 ))}
               </tr>
-              <tr>
-                <td className="p-4 text-gray-300 font-medium">Item Coverage</td>
+              <tr className="border-b border-gray-100">
+                <td className="p-4 text-gray-600 font-medium">Item Coverage</td>
                 {products.map((product) => (
-                  <td key={product.id} className="p-4 text-center text-white">
+                  <td key={product.id} className="p-4 text-center text-gray-900">
                     {formatCurrency(product.itemCoverage || 2000000)}
                   </td>
                 ))}
               </tr>
               {Array.from(allCustomFilters).map((filterKey) => (
-                <tr key={filterKey}>
-                  <td className="p-4 text-gray-300 font-medium">{filterKey}</td>
+                <tr key={filterKey} className="border-b border-gray-100">
+                  <td className="p-4 text-gray-600 font-medium">{filterKey}</td>
                   {products.map((product) => (
-                    <td key={product.id} className="p-4 text-center text-white">
+                    <td key={product.id} className="p-4 text-center text-gray-900">
                       {product.customFilters?.[filterKey] || 'N/A'}
                     </td>
                   ))}

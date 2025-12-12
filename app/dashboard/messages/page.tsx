@@ -9,7 +9,7 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import { useAuth } from '@/contexts/AuthContext'
 import { useSearchParams } from 'next/navigation'
-import { Send, MessageSquare } from 'lucide-react'
+import { Send, MessageSquare, Clock, Check, CheckCheck } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 export default function MessagesPage() {
@@ -24,35 +24,38 @@ export default function MessagesPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (userData) {
-      loadConversations()
-    }
-  }, [userData])
-
-  useEffect(() => {
-    if (selectedConversation) {
-      loadMessages(selectedConversation)
+    if (selectedConversation && db) {
+      const unsubscribe = loadMessages(selectedConversation)
+      return () => {
+        if (unsubscribe) unsubscribe()
+      }
     }
   }, [selectedConversation])
 
-  const loadConversations = async () => {
-    if (!userData) return
-    try {
-      const q = query(
-        collection(db, 'conversations'),
-        where('participantIds', 'array-contains', userData.uid),
-        orderBy('updatedAt', 'desc')
-      )
-      const snapshot = await getDocs(q)
+  useEffect(() => {
+    if (!userData || !db) return
+
+    // Real-time listener for conversations
+    const q = query(
+      collection(db, 'conversations'),
+      where('participantIds', 'array-contains', userData.uid),
+      orderBy('updatedAt', 'desc')
+    )
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
       setConversations(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Conversation & { id: string })))
-    } catch (error) {
-      console.error('Error loading conversations:', error)
-    } finally {
       setLoading(false)
-    }
-  }
+    }, (error) => {
+      console.error('Error loading conversations:', error)
+      setLoading(false)
+    })
+
+    return () => unsubscribe()
+  }, [userData])
 
   const loadMessages = (conversationId: string) => {
+    if (!db) return
+
     const q = query(
       collection(db, 'messages'),
       where('conversationId', '==', conversationId),
@@ -60,7 +63,19 @@ export default function MessagesPage() {
     )
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      setMessages(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Message & { id: string })))
+      const loadedMessages = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Message & { id: string }))
+      setMessages(loadedMessages)
+      
+      // Auto-scroll to bottom
+      setTimeout(() => {
+        const messagesContainer = document.getElementById('messages-container')
+        if (messagesContainer) {
+          messagesContainer.scrollTop = messagesContainer.scrollHeight
+        }
+      }, 100)
+    }, (error) => {
+      console.error('Error loading messages:', error)
+      toast.error('Failed to load messages')
     })
 
     return unsubscribe
@@ -81,11 +96,16 @@ export default function MessagesPage() {
         createdAt: Timestamp.now(),
       })
 
-      // Update conversation
-      const conversation = conversations.find((c) => c.id === selectedConversation)
-      if (conversation) {
-        // Update last message in conversation (should be done via API route)
-      }
+      // Trigger email notification
+      fetch('/api/notifications/email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'new_message',
+          customerEmail: '', // Will be fetched from user document
+          message: `You have a new message from ${userData.displayName}`,
+        }),
+      }).catch(console.error)
 
       setNewMessage('')
     } catch (error) {
@@ -118,33 +138,33 @@ export default function MessagesPage() {
   }
 
   if (loading) {
-    return <div className="text-white">Loading messages...</div>
+    return <div className="text-gray-700">Loading messages...</div>
   }
 
   const currentConversation = conversations.find((c) => c.id === selectedConversation)
 
   return (
-    <div className="flex h-[calc(100vh-200px)]">
+    <div className="flex flex-col md:flex-row h-[calc(100vh-200px)] gap-4">
       {/* Conversations List */}
-      <div className="w-1/3 border-r border-white/10 pr-4">
-        <h2 className="text-2xl font-bold text-white mb-4">Conversations</h2>
-        <div className="space-y-2 overflow-y-auto">
+      <div className="w-full md:w-1/3 border-r-0 md:border-r border-gray-200 pr-0 md:pr-4">
+        <h2 className="text-2xl font-semibold text-gray-900 mb-4">Conversations</h2>
+        <div className="space-y-2 overflow-y-auto max-h-[300px] md:max-h-full">
           {conversations.map((conversation) => {
             const otherParticipantId = conversation.participantIds.find((id) => id !== userData?.uid)
             const otherParticipantName = conversation.participantNames[otherParticipantId || '']
             return (
               <Card
                 key={conversation.id}
-                variant="glass"
+                variant="default"
                 hover
                 className={`p-4 cursor-pointer ${
                   selectedConversation === conversation.id ? 'border-primary border-2' : ''
                 }`}
                 onClick={() => setSelectedConversation(conversation.id)}
               >
-                <h3 className="text-white font-semibold mb-1">{otherParticipantName}</h3>
+                <h3 className="text-gray-900 font-semibold mb-1">{otherParticipantName}</h3>
                 {conversation.lastMessage && (
-                  <p className="text-gray-400 text-sm truncate">
+                  <p className="text-gray-600 text-sm truncate">
                     {conversation.lastMessage.content}
                   </p>
                 )}
@@ -155,35 +175,61 @@ export default function MessagesPage() {
       </div>
 
       {/* Messages */}
-      <div className="flex-1 flex flex-col pl-4">
+      <div className="flex-1 flex flex-col pl-0 md:pl-4">
         {selectedConversation ? (
           <>
             <div className="mb-4">
-              <h2 className="text-2xl font-bold text-white">
+              <h2 className="text-2xl font-semibold text-gray-900">
                 {currentConversation?.participantNames[
                   currentConversation.participantIds.find((id) => id !== userData?.uid) || ''
                 ]}
               </h2>
             </div>
-            <div className="flex-1 overflow-y-auto space-y-4 mb-4">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.senderId === userData?.uid ? 'justify-end' : 'justify-start'}`}
-                >
-                  <Card
-                    variant={message.senderId === userData?.uid ? 'glass-red' : 'glass'}
-                    className={`max-w-md p-4 ${
-                      message.senderId === userData?.uid ? 'ml-auto' : 'mr-auto'
-                    }`}
-                  >
-                    <p className="text-white">{message.content}</p>
-                    <p className="text-gray-400 text-xs mt-2">
-                      {message.createdAt.toDate().toLocaleTimeString()}
-                    </p>
-                  </Card>
+            <div id="messages-container" className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2">
+              {messages.length === 0 ? (
+                <div className="text-center py-8">
+                  <MessageSquare className="mx-auto mb-2 text-gray-400" size={32} />
+                  <p className="text-gray-500">No messages yet. Start the conversation!</p>
                 </div>
-              ))}
+              ) : (
+                messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`flex ${message.senderId === userData?.uid ? 'justify-end' : 'justify-start'}`}
+                  >
+                    <div className={`max-w-md ${message.senderId === userData?.uid ? 'ml-auto' : 'mr-auto'}`}>
+                      <Card
+                        variant="default"
+                        className={`p-4 ${
+                          message.senderId === userData?.uid 
+                            ? 'bg-primary text-white' 
+                            : 'bg-white border border-gray-200'
+                        }`}
+                      >
+                        <p className={message.senderId === userData?.uid ? 'text-white' : 'text-gray-900'}>
+                          {message.content}
+                        </p>
+                        <div className={`flex items-center gap-2 mt-2 ${
+                          message.senderId === userData?.uid ? 'text-white/70' : 'text-gray-500'
+                        }`}>
+                          <span className="text-xs">
+                            {message.createdAt.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                          {message.senderId === userData?.uid && (
+                            <span className="text-xs">
+                              {message.read ? (
+                                <CheckCheck size={12} className="inline" />
+                              ) : (
+                                <Check size={12} className="inline" />
+                              )}
+                            </span>
+                          )}
+                        </div>
+                      </Card>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
             <div className="flex gap-2">
               <Input
@@ -201,8 +247,8 @@ export default function MessagesPage() {
         ) : (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <MessageSquare className="mx-auto mb-4 text-gray-600" size={48} />
-              <p className="text-gray-300 text-xl">Select a conversation to start messaging</p>
+              <MessageSquare className="mx-auto mb-4 text-gray-400" size={48} />
+              <p className="text-gray-600 text-xl">Select a conversation to start messaging</p>
             </div>
           </div>
         )}

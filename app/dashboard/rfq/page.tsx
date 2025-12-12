@@ -85,12 +85,12 @@ export default function RFQPage() {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold text-white mb-8">Request for Quote</h1>
-      <Card variant="glass" className="p-8">
+      <h1 className="text-4xl font-semibold text-gray-900 mb-8">Request for Quote</h1>
+      <Card variant="default" className="p-8">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Event Date *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Event Date *</label>
               <Input
                 type="date"
                 value={formData.eventDate}
@@ -99,7 +99,7 @@ export default function RFQPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Event Type *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Event Type *</label>
               <Input
                 placeholder="e.g., Wedding, Corporate Event, Birthday"
                 value={formData.eventType}
@@ -108,7 +108,7 @@ export default function RFQPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">City *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
               <Input
                 placeholder="Lagos"
                 value={formData.city}
@@ -117,7 +117,7 @@ export default function RFQPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">State *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
               <Input
                 placeholder="Lagos State"
                 value={formData.state}
@@ -126,7 +126,7 @@ export default function RFQPage() {
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-300 mb-2">Budget (Optional)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Budget (Optional)</label>
               <Input
                 type="number"
                 placeholder="Enter your budget in NGN"
@@ -138,7 +138,7 @@ export default function RFQPage() {
 
           <div>
             <div className="flex justify-between items-center mb-4">
-              <label className="block text-sm font-medium text-gray-300">Items Needed *</label>
+              <label className="block text-sm font-medium text-gray-700">Items Needed *</label>
               <Button type="button" variant="outline" size="sm" onClick={addItem}>
                 <Plus size={16} className="mr-2" />
                 Add Item
@@ -146,14 +146,14 @@ export default function RFQPage() {
             </div>
             <div className="space-y-4">
               {formData.items.map((item, index) => (
-                <Card key={index} variant="glass-dark" className="p-4">
+                <Card key={index} variant="default" className="p-4">
                   <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-white font-semibold">Item {index + 1}</h3>
+                    <h3 className="text-gray-900 font-semibold">Item {index + 1}</h3>
                     {formData.items.length > 1 && (
                       <button
                         type="button"
                         onClick={() => removeItem(index)}
-                        className="text-red-500 hover:text-red-400"
+                        className="text-red-600 hover:text-red-700"
                       >
                         <X size={20} />
                       </button>
@@ -161,7 +161,7 @@ export default function RFQPage() {
                   </div>
                   <div className="grid md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-2">Category</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
                       <Input
                         placeholder="e.g., Chairs, Tables, Sound System"
                         value={item.category}
@@ -170,7 +170,7 @@ export default function RFQPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-2">Quantity</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Quantity</label>
                       <Input
                         type="number"
                         min="1"
@@ -180,7 +180,7 @@ export default function RFQPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-400 mb-2">Description (Optional)</label>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Description (Optional)</label>
                       <Input
                         placeholder="Additional details"
                         value={item.description}

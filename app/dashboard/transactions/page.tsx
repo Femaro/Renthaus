@@ -41,67 +41,67 @@ export default function TransactionsPage() {
   }
 
   if (loading) {
-    return <div className="text-white">Loading transactions...</div>
+    return <div className="text-gray-700">Loading transactions...</div>
   }
 
   return (
     <div>
-      <h1 className="text-4xl font-bold text-white mb-8">Financial Control</h1>
+      <h1 className="text-4xl font-semibold text-gray-900 mb-8">Financial Control</h1>
 
       <div className="grid md:grid-cols-3 gap-6 mb-8">
-        <Card variant="glass-red" className="p-6">
+        <Card variant="default" className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-gray-300 font-medium">Total Revenue</h3>
+            <h3 className="text-gray-600 font-medium">Total Revenue</h3>
             <TrendingUp className="text-primary" size={24} />
           </div>
-          <p className="text-3xl font-bold text-white">{formatCurrency(stats.totalRevenue)}</p>
+          <p className="text-3xl font-semibold text-gray-900">{formatCurrency(stats.totalRevenue)}</p>
         </Card>
-        <Card variant="glass" className="p-6">
+        <Card variant="default" className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-gray-300 font-medium">Total Commission</h3>
+            <h3 className="text-gray-600 font-medium">Total Commission</h3>
             <DollarSign className="text-primary" size={24} />
           </div>
-          <p className="text-3xl font-bold text-white">{formatCurrency(stats.totalCommission)}</p>
+          <p className="text-3xl font-semibold text-gray-900">{formatCurrency(stats.totalCommission)}</p>
         </Card>
-        <Card variant="glass" className="p-6">
+        <Card variant="default" className="p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-gray-300 font-medium">Total Transactions</h3>
-            <DollarSign className="text-green-400" size={24} />
+            <h3 className="text-gray-600 font-medium">Total Transactions</h3>
+            <DollarSign className="text-green-600" size={24} />
           </div>
-          <p className="text-3xl font-bold text-white">{stats.totalTransactions}</p>
+          <p className="text-3xl font-semibold text-gray-900">{stats.totalTransactions}</p>
         </Card>
       </div>
 
-      <Card variant="glass" className="p-6">
-        <h2 className="text-2xl font-bold text-white mb-6">All Transactions</h2>
+      <Card variant="default" className="p-6">
+        <h2 className="text-2xl font-semibold text-gray-900 mb-6">All Transactions</h2>
         {orders.length === 0 ? (
-          <p className="text-gray-300 text-center py-8">No transactions yet</p>
+          <p className="text-gray-600 text-center py-8">No transactions yet</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/10">
-                  <th className="text-left p-4 text-gray-300 font-semibold">Order ID</th>
-                  <th className="text-left p-4 text-gray-300 font-semibold">Product</th>
-                  <th className="text-left p-4 text-gray-300 font-semibold">Date</th>
-                  <th className="text-left p-4 text-gray-300 font-semibold">Amount</th>
-                  <th className="text-left p-4 text-gray-300 font-semibold">Commission</th>
-                  <th className="text-left p-4 text-gray-300 font-semibold">Status</th>
+                <tr className="border-b border-gray-200">
+                  <th className="text-left p-4 text-gray-700 font-semibold">Order ID</th>
+                  <th className="text-left p-4 text-gray-700 font-semibold">Product</th>
+                  <th className="text-left p-4 text-gray-700 font-semibold">Date</th>
+                  <th className="text-left p-4 text-gray-700 font-semibold">Amount</th>
+                  <th className="text-left p-4 text-gray-700 font-semibold">Commission</th>
+                  <th className="text-left p-4 text-gray-700 font-semibold">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {orders.map((order) => (
-                  <tr key={order.id} className="border-b border-white/5">
-                    <td className="p-4 text-white text-sm">{order.id.slice(0, 8)}...</td>
-                    <td className="p-4 text-white">{order.productTitle}</td>
-                    <td className="p-4 text-gray-400 text-sm">{formatDate(order.createdAt.toDate())}</td>
-                    <td className="p-4 text-white font-semibold">{formatCurrency(order.totalAmount)}</td>
+                  <tr key={order.id} className="border-b border-gray-100">
+                    <td className="p-4 text-gray-900 text-sm">{order.id.slice(0, 8)}...</td>
+                    <td className="p-4 text-gray-900">{order.productTitle}</td>
+                    <td className="p-4 text-gray-600 text-sm">{formatDate(order.createdAt.toDate())}</td>
+                    <td className="p-4 text-gray-900 font-semibold">{formatCurrency(order.totalAmount)}</td>
                     <td className="p-4 text-primary font-semibold">{formatCurrency(order.commission)}</td>
                     <td className="p-4">
-                      <span className={`px-2 py-1 rounded text-xs ${
-                        order.status === 'completed' ? 'bg-green-500/20 text-green-400' :
-                        order.status === 'in-progress' ? 'bg-blue-500/20 text-blue-400' :
-                        'bg-yellow-500/20 text-yellow-400'
+                      <span className={`px-2 py-1 rounded text-xs border ${
+                        order.status === 'completed' ? 'bg-green-50 text-green-700 border-green-200' :
+                        order.status === 'in-progress' ? 'bg-blue-50 text-blue-700 border-blue-200' :
+                        'bg-yellow-50 text-yellow-700 border-yellow-200'
                       }`}>
                         {order.status}
                       </span>

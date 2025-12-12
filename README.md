@@ -59,6 +59,22 @@ npm run dev
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+## Dashboard Access & Login Information
+
+For detailed login information, test accounts, and dashboard links, see **[DASHBOARD_ACCESS.md](./DASHBOARD_ACCESS.md)**
+
+### Quick Dashboard Links
+- **Login**: http://localhost:3000/login
+- **Register**: http://localhost:3000/register
+- **Customer Dashboard**: http://localhost:3000/dashboard (after login as customer)
+- **Vendor Dashboard**: http://localhost:3000/dashboard (after login as vendor)
+- **Admin Dashboard**: http://localhost:3000/dashboard (after login as admin)
+
+### Quick Test Accounts Setup
+1. **Customer**: Register at `/register` → Select "Rent Items"
+2. **Vendor**: Register at `/register?role=vendor` → Select "List Items"
+3. **Admin**: Register as customer/vendor, then update `role` to `"admin"` in Firestore
+
 ## Environment Variables
 
 Required environment variables (see `.env.example`):

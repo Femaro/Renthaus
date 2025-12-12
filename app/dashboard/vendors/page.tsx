@@ -43,10 +43,10 @@ export default function VendorsPage() {
         registrationStatus: status,
         updatedAt: new Date(),
       })
-      toast.success(`Vendor ${status === 'approved' ? 'approved' : 'rejected'}`)
+      toast.success(`Equipment owner ${status === 'approved' ? 'approved' : 'rejected'}`)
       loadVendors()
     } catch (error) {
-      toast.error('Failed to update vendor status')
+      toast.error('Failed to update equipment owner status')
     }
   }
 
@@ -56,20 +56,20 @@ export default function VendorsPage() {
         verified: true,
         updatedAt: new Date(),
       })
-      toast.success('Vendor verified')
+      toast.success('Equipment owner verified')
       loadVendors()
     } catch (error) {
-      toast.error('Failed to verify vendor')
+      toast.error('Failed to verify equipment owner')
     }
   }
 
   if (loading) {
-    return <div className="text-white">Loading vendors...</div>
+    return <div className="text-gray-700">Loading vendors...</div>
   }
 
   return (
     <div>
-      <h1 className="text-4xl font-bold text-white mb-8">Vendor Management</h1>
+      <h1 className="text-4xl font-semibold text-gray-900 mb-8">Equipment Owner Management</h1>
 
       <div className="flex gap-4 mb-6">
         {(['all', 'pending', 'approved', 'rejected'] as const).map((f) => (
@@ -85,17 +85,17 @@ export default function VendorsPage() {
       </div>
 
       {vendors.length === 0 ? (
-        <Card variant="glass" className="text-center py-12">
-          <p className="text-gray-300 text-xl">No vendors found</p>
+        <Card variant="default" className="text-center py-12">
+          <p className="text-gray-600 text-xl">No equipment owners found</p>
         </Card>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {vendors.map((vendor) => (
-            <Card key={vendor.id} variant="glass" className="p-6">
+            <Card key={vendor.id} variant="default" className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="text-xl font-bold text-white mb-1">{vendor.businessName}</h3>
-                  <p className="text-gray-400 text-sm">{vendor.email}</p>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-1">{vendor.businessName}</h3>
+                  <p className="text-gray-500 text-sm">{vendor.email}</p>
                 </div>
                 {vendor.verified && (
                   <Shield className="text-primary" size={20} />
@@ -104,23 +104,23 @@ export default function VendorsPage() {
               
               <div className="space-y-2 mb-4">
                 <div>
-                  <p className="text-gray-400 text-xs">Registration Status</p>
-                  <span className={`inline-block px-2 py-1 rounded text-xs font-semibold ${
-                    vendor.registrationStatus === 'approved' ? 'bg-green-500/20 text-green-400' :
-                    vendor.registrationStatus === 'rejected' ? 'bg-red-500/20 text-red-400' :
-                    'bg-yellow-500/20 text-yellow-400'
+                  <p className="text-gray-500 text-xs">Registration Status</p>
+                  <span className={`inline-block px-2 py-1 rounded text-xs font-semibold border ${
+                    vendor.registrationStatus === 'approved' ? 'bg-green-50 text-green-700 border-green-200' :
+                    vendor.registrationStatus === 'rejected' ? 'bg-red-50 text-red-700 border-red-200' :
+                    'bg-yellow-50 text-yellow-700 border-yellow-200'
                   }`}>
                     {vendor.registrationStatus}
                   </span>
                 </div>
                 <div>
-                  <p className="text-gray-400 text-xs">Location</p>
-                  <p className="text-white text-sm">{vendor.businessAddress}</p>
+                  <p className="text-gray-500 text-xs">Location</p>
+                  <p className="text-gray-900 text-sm">{vendor.businessAddress}</p>
                 </div>
                 {vendor.registrationNumber && (
                   <div>
-                    <p className="text-gray-400 text-xs">Registration Number</p>
-                    <p className="text-white text-sm">{vendor.registrationNumber}</p>
+                    <p className="text-gray-500 text-xs">Registration Number</p>
+                    <p className="text-gray-900 text-sm">{vendor.registrationNumber}</p>
                   </div>
                 )}
               </div>

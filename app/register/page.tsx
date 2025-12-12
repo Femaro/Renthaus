@@ -116,7 +116,8 @@ export default function RegisterPage() {
                     : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <span className="font-medium">Rent Items</span>
+                <span className="font-medium">Rent Equipment</span>
+                <p className="text-xs mt-1 opacity-70">I need event equipment</p>
               </button>
               <button
                 type="button"
@@ -127,7 +128,8 @@ export default function RegisterPage() {
                     : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <span className="font-medium">List Items</span>
+                <span className="font-medium">List Equipment</span>
+                <p className="text-xs mt-1 opacity-70">I own event equipment</p>
               </button>
             </div>
           </div>

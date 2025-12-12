@@ -1,15 +1,17 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { collection, query, where, getDocs, orderBy, updateDoc, doc } from 'firebase/firestore'
+import { collection, query, where, getDocs, orderBy, updateDoc, doc, getDoc } from 'firebase/firestore'
 import { db } from '@/lib/firebase/config'
 import { Order } from '@/lib/firebase/types'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
+import { SkeletonList } from '@/components/ui/Skeleton'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { useAuth } from '@/contexts/AuthContext'
-import { Package, Calendar, MapPin, Check } from 'lucide-react'
+import { Package, Calendar, MapPin, Check, Download } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { exportToCSV, formatOrdersForExport } from '@/lib/export-utils'
 
 export default function OrdersPage() {
   const { userData } = useAuth()
@@ -43,6 +45,23 @@ export default function OrdersPage() {
         status,
         updatedAt: new Date(),
       })
+      
+      // Trigger email notification
+      const orderDoc = await getDoc(doc(db, 'orders', orderId))
+      const orderData = orderDoc.data()
+      
+      if (orderData) {
+        fetch('/api/notifications/email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'order_status_update',
+            orderId,
+            customerEmail: orderData.customerEmail || '',
+          }),
+        }).catch(console.error)
+      }
+      
       toast.success('Order status updated')
       loadOrders()
     } catch (error) {
@@ -53,38 +72,67 @@ export default function OrdersPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return 'text-green-400 bg-green-500/20'
+        return 'bg-green-50 text-green-700 border-green-200'
       case 'in-progress':
-        return 'text-blue-400 bg-blue-500/20'
+        return 'bg-blue-50 text-blue-700 border-blue-200'
       case 'completed':
-        return 'text-gray-400 bg-gray-500/20'
+        return 'bg-gray-50 text-gray-700 border-gray-200'
       case 'cancelled':
-        return 'text-red-400 bg-red-500/20'
+        return 'bg-red-50 text-red-700 border-red-200'
       default:
-        return 'text-yellow-400 bg-yellow-500/20'
+        return 'bg-yellow-50 text-yellow-700 border-yellow-200'
     }
   }
 
   if (loading) {
-    return <div className="text-white">Loading orders...</div>
+    return (
+      <div>
+        <h1 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-6 md:mb-8">Rental Orders</h1>
+        <SkeletonList count={5} />
+      </div>
+    )
+  }
+
+  const handleExport = () => {
+    try {
+      if (orders.length === 0) {
+        toast.error('No orders to export')
+        return
+      }
+      
+      const exportData = formatOrdersForExport(orders)
+      exportToCSV(exportData, `orders-export-${new Date().toISOString().split('T')[0]}`)
+      toast.success('Orders exported successfully')
+    } catch (error) {
+      console.error('Export error:', error)
+      toast.error('Failed to export orders')
+    }
   }
 
   return (
     <div>
-      <h1 className="text-4xl font-bold text-white mb-8">Orders</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 md:mb-8">
+        <h1 className="text-3xl md:text-4xl font-semibold text-gray-900">Rental Orders</h1>
+        {orders.length > 0 && (
+          <Button variant="outline" onClick={handleExport}>
+            <Download className="mr-2" size={18} />
+            Export Orders
+          </Button>
+        )}
+      </div>
       {orders.length === 0 ? (
-        <Card variant="glass" className="text-center py-12">
-          <Package className="mx-auto mb-4 text-gray-600" size={48} />
-          <p className="text-gray-300 text-xl">No orders yet</p>
+        <Card variant="default" className="text-center py-12">
+          <Package className="mx-auto mb-4 text-gray-400" size={48} />
+          <p className="text-gray-600 text-xl">No orders yet</p>
         </Card>
       ) : (
         <div className="space-y-4">
           {orders.map((order) => (
-            <Card key={order.id} variant="glass" className="p-6">
+            <Card key={order.id} variant="default" className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="text-2xl font-bold text-white mb-2">{order.productTitle}</h3>
-                  <div className="flex items-center gap-4 text-gray-300">
+                  <h3 className="text-2xl font-semibold text-gray-900 mb-2">{order.productTitle}</h3>
+                  <div className="flex items-center gap-4 text-gray-600">
                     <div className="flex items-center gap-2">
                       <Calendar size={16} />
                       <span>{formatDate(order.startDate.toDate())} - {formatDate(order.endDate.toDate())}</span>
@@ -98,23 +146,23 @@ export default function OrdersPage() {
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className={`px-3 py-1 rounded-full text-sm font-semibold ${getStatusColor(order.status)}`}>
+                  <span className={`px-3 py-1 rounded-full text-sm font-semibold border ${getStatusColor(order.status)}`}>
                     {order.status.toUpperCase()}
                   </span>
                 </div>
               </div>
-              <div className="grid md:grid-cols-3 gap-4 mb-4 pt-4 border-t border-white/10">
+              <div className="grid md:grid-cols-3 gap-4 mb-4 pt-4 border-t border-gray-100">
                 <div>
-                  <p className="text-gray-400 text-sm">Rental Fee</p>
-                  <p className="text-white font-semibold">{formatCurrency(order.rentalFee)}</p>
+                  <p className="text-gray-500 text-sm">Rental Fee</p>
+                  <p className="text-gray-900 font-semibold">{formatCurrency(order.rentalFee)}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400 text-sm">Security Deposit</p>
-                  <p className="text-white font-semibold">{formatCurrency(order.securityDeposit)}</p>
+                  <p className="text-gray-500 text-sm">Security Deposit</p>
+                  <p className="text-gray-900 font-semibold">{formatCurrency(order.securityDeposit)}</p>
                 </div>
                 <div>
-                  <p className="text-gray-400 text-sm">Total Amount</p>
-                  <p className="text-2xl font-bold text-primary">{formatCurrency(order.totalAmount)}</p>
+                  <p className="text-gray-500 text-sm">Total Amount</p>
+                  <p className="text-2xl font-semibold text-primary">{formatCurrency(order.totalAmount)}</p>
                 </div>
               </div>
               {order.status === 'pending' && (

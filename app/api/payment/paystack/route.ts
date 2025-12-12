@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getFirestore } from 'firebase-admin/firestore'
 import admin from '@/lib/firebase/admin'
 
-const db = getFirestore()
+const db = admin.firestore()
 
 export async function POST(request: NextRequest) {
   try {
@@ -71,12 +70,42 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Payment verification failed' }, { status: 400 })
     }
 
+    // Get order ID from metadata or use reference as order ID
+    const orderId = data.data.metadata?.orderId || reference
+    
     // Update order status
-    const orderRef = db.collection('orders').doc(reference)
+    const orderRef = db.collection('orders').doc(orderId)
+    const orderDoc = await orderRef.get()
+    
+    if (!orderDoc.exists) {
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 })
+    }
+
     await orderRef.update({
       paymentStatus: 'paid',
+      status: 'confirmed',
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     })
+
+    // Send email notification (async, don't wait)
+    const orderData = orderDoc.data()
+    if (orderData) {
+      // Get customer email from user document
+      const customerDoc = await db.collection('users').doc(orderData.customerId).get()
+      const customerData = customerDoc.data()
+      
+      // Trigger email notification (non-blocking)
+      fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/notifications/email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'payment_success',
+          orderId: orderId,
+          customerEmail: customerData?.email || orderData.customerEmail || '',
+          vendorId: orderData.vendorId,
+        }),
+      }).catch(console.error)
+    }
 
     return NextResponse.json({ success: true, data: data.data })
   } catch (error: any) {

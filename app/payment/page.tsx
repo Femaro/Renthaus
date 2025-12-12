@@ -78,53 +78,59 @@ export default function PaymentPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-black via-secondary to-black flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+          <div className="text-gray-600">Loading payment...</div>
+        </div>
       </div>
     )
   }
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-black via-secondary to-black flex items-center justify-center">
-        <div className="text-white">Order not found</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card variant="default" className="p-8 text-center">
+          <Shield className="mx-auto mb-4 text-gray-400" size={48} />
+          <div className="text-gray-600 text-xl">Order not found</div>
+        </Card>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-secondary to-black p-8">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-4xl font-bold text-white mb-8">Complete Payment</h1>
+        <h1 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-6 md:mb-8">Complete Payment</h1>
 
-        <Card variant="glass-red" className="p-8 mb-6">
+        <Card variant="default" className="p-8 mb-6 bg-primary/5 border-primary/20">
           <div className="flex items-center gap-3 mb-6">
             <Shield className="text-primary" size={32} />
-            <h2 className="text-2xl font-bold text-white">Secure Payment</h2>
+            <h2 className="text-2xl font-semibold text-gray-900">Secure Payment</h2>
           </div>
-          <p className="text-gray-300 mb-6">
+          <p className="text-gray-600 mb-6">
             Your payment is secured by Paystack. The security deposit will be held in escrow until the rental is completed.
           </p>
         </Card>
 
-        <Card variant="glass" className="p-8 mb-6">
-          <h3 className="text-xl font-bold text-white mb-4">Order Summary</h3>
+        <Card variant="default" className="p-8 mb-6">
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">Order Summary</h3>
           <div className="space-y-3 mb-6">
             <div className="flex justify-between">
-              <span className="text-gray-300">Product</span>
-              <span className="text-white font-semibold">{order.productTitle}</span>
+              <span className="text-gray-600">Product</span>
+              <span className="text-gray-900 font-semibold">{order.productTitle}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-300">Rental Fee</span>
-              <span className="text-white">{formatCurrency(order.rentalFee)}</span>
+              <span className="text-gray-600">Rental Fee</span>
+              <span className="text-gray-900">{formatCurrency(order.rentalFee)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-300">Security Deposit</span>
-              <span className="text-white">{formatCurrency(order.securityDeposit)}</span>
+              <span className="text-gray-600">Security Deposit</span>
+              <span className="text-gray-900">{formatCurrency(order.securityDeposit)}</span>
             </div>
-            <div className="border-t border-white/20 pt-3 flex justify-between">
-              <span className="text-xl font-bold text-white">Total</span>
-              <span className="text-2xl font-bold text-primary">{formatCurrency(order.totalAmount)}</span>
+            <div className="border-t border-gray-200 pt-3 flex justify-between">
+              <span className="text-xl font-semibold text-gray-900">Total</span>
+              <span className="text-2xl font-semibold text-primary">{formatCurrency(order.totalAmount)}</span>
             </div>
           </div>
         </Card>

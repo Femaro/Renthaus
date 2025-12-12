@@ -117,16 +117,22 @@ export default function CheckoutPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-black via-secondary to-black flex items-center justify-center">
-        <div className="text-white">Loading...</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+          <div className="text-gray-600">Loading checkout...</div>
+        </div>
       </div>
     )
   }
 
   if (!product) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-black via-secondary to-black flex items-center justify-center">
-        <div className="text-white">Product not found</div>
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card variant="default" className="p-8 text-center">
+          <Package className="mx-auto mb-4 text-gray-400" size={48} />
+          <div className="text-gray-600 text-xl">Product not found</div>
+        </Card>
       </div>
     )
   }
@@ -136,17 +142,17 @@ export default function CheckoutPage() {
   const total = rentalFee + securityDeposit
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-secondary to-black p-8">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-white mb-8">Checkout</h1>
+        <h1 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-6 md:mb-8">Checkout</h1>
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
-            <Card variant="glass" className="p-6">
-              <h2 className="text-2xl font-bold text-white mb-4">Rental Details</h2>
+            <Card variant="default" className="p-6">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Rental Details</h2>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Start Date *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Start Date *</label>
                   <Input
                     type="date"
                     value={formData.startDate}
@@ -155,7 +161,7 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">End Date *</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">End Date *</label>
                   <Input
                     type="date"
                     value={formData.endDate}
@@ -165,7 +171,7 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Delivery Address</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Delivery Address</label>
                   <Input
                     placeholder="Enter delivery address"
                     value={formData.deliveryAddress}
@@ -173,9 +179,9 @@ export default function CheckoutPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Delivery Instructions</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Delivery Instructions</label>
                   <textarea
-                    className="w-full px-4 py-3 rounded-2xl glass border border-white/20 focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-200 placeholder:text-gray-400 text-white bg-transparent"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 placeholder:text-gray-400 text-gray-900 bg-white"
                     placeholder="Any special instructions for delivery..."
                     value={formData.deliveryInstructions}
                     onChange={(e) => setFormData({ ...formData, deliveryInstructions: e.target.value })}
@@ -186,13 +192,13 @@ export default function CheckoutPage() {
             </Card>
 
             {product.addOnServices && product.addOnServices.length > 0 && (
-              <Card variant="glass" className="p-6">
-                <h2 className="text-2xl font-bold text-white mb-4">Add-on Services</h2>
+              <Card variant="default" className="p-6">
+                <h2 className="text-2xl font-semibold text-gray-900 mb-4">Add-on Services</h2>
                 <div className="space-y-3">
                   {product.addOnServices.map((service) => (
                     <label
                       key={service.id}
-                      className="flex items-center justify-between p-4 rounded-xl glass border border-white/10 hover:border-primary/50 cursor-pointer transition-all"
+                      className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-200 hover:border-primary/50 cursor-pointer transition-all"
                     >
                       <div className="flex items-center gap-3">
                         <input
@@ -214,9 +220,9 @@ export default function CheckoutPage() {
                           className="w-5 h-5 rounded text-primary focus:ring-primary"
                         />
                         <div>
-                          <p className="text-white font-medium">{service.name}</p>
+                          <p className="text-gray-900 font-medium">{service.name}</p>
                           {service.description && (
-                            <p className="text-gray-400 text-sm">{service.description}</p>
+                            <p className="text-gray-500 text-sm">{service.description}</p>
                           )}
                           {service.mandatory && (
                             <span className="text-xs text-primary">Required</span>
@@ -232,20 +238,20 @@ export default function CheckoutPage() {
           </div>
 
           <div>
-            <Card variant="glass-red" className="p-6 sticky top-8">
-              <h2 className="text-2xl font-bold text-white mb-4">Order Summary</h2>
+            <Card variant="default" className="p-6 sticky top-8 bg-primary/5 border-primary/20">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Order Summary</h2>
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between">
-                  <span className="text-gray-300">Rental Fee</span>
-                  <span className="text-white font-semibold">{formatCurrency(rentalFee)}</span>
+                  <span className="text-gray-600">Rental Fee</span>
+                  <span className="text-gray-900 font-semibold">{formatCurrency(rentalFee)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-300">Security Deposit</span>
-                  <span className="text-white font-semibold">{formatCurrency(securityDeposit)}</span>
+                  <span className="text-gray-600">Security Deposit</span>
+                  <span className="text-gray-900 font-semibold">{formatCurrency(securityDeposit)}</span>
                 </div>
-                <div className="border-t border-white/20 pt-3 flex justify-between">
-                  <span className="text-xl font-bold text-white">Total</span>
-                  <span className="text-xl font-bold text-primary">{formatCurrency(total)}</span>
+                <div className="border-t border-gray-200 pt-3 flex justify-between">
+                  <span className="text-xl font-semibold text-gray-900">Total</span>
+                  <span className="text-xl font-semibold text-primary">{formatCurrency(total)}</span>
                 </div>
               </div>
               <Button onClick={handleCheckout} className="w-full" size="lg" disabled={processing}>

@@ -101,15 +101,15 @@ export default function InventoryPage() {
   }
 
   if (loading) {
-    return <div className="text-white">Loading...</div>
+    return <div className="text-gray-700">Loading...</div>
   }
 
   if (products.length === 0) {
     return (
       <div>
-        <h1 className="text-4xl font-bold text-white mb-8">Inventory Management</h1>
-        <Card variant="glass" className="text-center py-12">
-          <p className="text-gray-300 text-xl">No products found. Create a listing first.</p>
+        <h1 className="text-4xl font-semibold text-gray-900 mb-8">Inventory Management</h1>
+        <Card variant="default" className="text-center py-12">
+          <p className="text-gray-600 text-xl">No products found. Create a listing first.</p>
         </Card>
       </div>
     )
@@ -119,17 +119,17 @@ export default function InventoryPage() {
 
   return (
     <div>
-      <h1 className="text-4xl font-bold text-white mb-8">Inventory Management</h1>
+      <h1 className="text-4xl font-semibold text-gray-900 mb-8">Inventory Management</h1>
 
-      <Card variant="glass" className="mb-6 p-6">
-        <label className="block text-sm font-medium text-gray-300 mb-2">Select Product</label>
+      <Card variant="default" className="mb-6 p-6">
+        <label className="block text-sm font-medium text-gray-700 mb-2">Select Product</label>
         <select
           value={selectedProduct}
           onChange={(e) => setSelectedProduct(e.target.value)}
-          className="w-full px-4 py-3 rounded-2xl glass border border-white/20 focus:outline-none focus:ring-2 focus:ring-primary text-white bg-transparent"
+          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-white"
         >
           {products.map((product) => (
-            <option key={product.id} value={product.id} className="bg-black">
+            <option key={product.id} value={product.id}>
               {product.title}
             </option>
           ))}
@@ -137,8 +137,8 @@ export default function InventoryPage() {
       </Card>
 
       {selectedProduct && (
-        <Card variant="glass" className="p-6">
-          <h2 className="text-2xl font-bold text-white mb-6">
+        <Card variant="default" className="p-6">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-6">
             {products.find((p) => p.id === selectedProduct)?.title} - Availability Calendar
           </h2>
           <div className="grid grid-cols-7 gap-2">
@@ -171,12 +171,12 @@ export default function InventoryPage() {
           </div>
           <div className="mt-6 flex gap-4">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-green-500/20 border-2 border-green-500 rounded"></div>
-              <span className="text-gray-300 text-sm">Available</span>
+              <div className="w-4 h-4 bg-green-50 border-2 border-green-500 rounded"></div>
+              <span className="text-gray-600 text-sm">Available</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-red-500/20 border-2 border-red-500 rounded"></div>
-              <span className="text-gray-300 text-sm">Unavailable</span>
+              <div className="w-4 h-4 bg-red-50 border-2 border-red-500 rounded"></div>
+              <span className="text-gray-600 text-sm">Unavailable</span>
             </div>
           </div>
         </Card>

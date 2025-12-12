@@ -35,8 +35,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser)
       if (firebaseUser) {
-        const data = await getUserData(firebaseUser.uid)
-        setUserData(data)
+        try {
+          const data = await getUserData(firebaseUser.uid)
+          setUserData(data)
+        } catch (error) {
+          console.error('Error fetching user data:', error)
+          // If user document doesn't exist, userData will be null
+          // This can happen if registration didn't complete properly
+          setUserData(null)
+        }
       } else {
         setUserData(null)
       }

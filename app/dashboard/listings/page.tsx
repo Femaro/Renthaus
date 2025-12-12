@@ -1,16 +1,18 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { collection, query, where, getDocs, addDoc, updateDoc, doc, deleteDoc } from 'firebase/firestore'
-import { db } from '@/lib/firebase/config'
+import { collection, query, where, getDocs, addDoc, updateDoc, doc, deleteDoc, Timestamp } from 'firebase/firestore'
+import { db, storage } from '@/lib/firebase/config'
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage'
 import { Product, AddOnService } from '@/lib/firebase/types'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import { formatCurrency } from '@/lib/utils'
 import { useAuth } from '@/contexts/AuthContext'
-import { Plus, Edit, Trash2, Eye, EyeOff } from 'lucide-react'
+import { Plus, Edit, Trash2, Eye, EyeOff, X, Upload, Image as ImageIcon } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Image from 'next/image'
 
 export default function ListingsPage() {
   const { userData } = useAuth()
@@ -31,7 +33,9 @@ export default function ListingsPage() {
     customFilters: {} as Record<string, string>,
     addOnServices: [] as AddOnService[],
     available: true,
+    images: [] as string[],
   })
+  const [uploadingImages, setUploadingImages] = useState(false)
 
   useEffect(() => {
     loadProducts()
@@ -72,17 +76,17 @@ export default function ListingsPage() {
         addOnServices: formData.addOnServices.length > 0 ? formData.addOnServices : undefined,
         itemCoverage: 2000000,
         available: formData.available,
-        images: [], // Should be handled via file upload
-        createdAt: new Date() as any,
-        updatedAt: new Date() as any,
+        images: formData.images,
+        createdAt: editingProduct ? undefined : Timestamp.now(),
+        updatedAt: Timestamp.now(),
       }
 
       if (editingProduct) {
         await updateDoc(doc(db, 'products', editingProduct), productData)
-        toast.success('Product updated successfully!')
+        toast.success('Equipment updated successfully!')
       } else {
         await addDoc(collection(db, 'products'), productData)
-        toast.success('Product created successfully!')
+        toast.success('Equipment added successfully!')
       }
 
       setShowForm(false)
@@ -91,8 +95,41 @@ export default function ListingsPage() {
       loadProducts()
     } catch (error) {
       console.error('Error saving product:', error)
-      toast.error('Failed to save product')
+      toast.error('Failed to save equipment')
     }
+  }
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    if (!files.length || !storage || !userData) return
+
+    setUploadingImages(true)
+    try {
+      const uploadPromises = files.map(async (file) => {
+        if (file.size > 5 * 1024 * 1024) {
+          throw new Error(`${file.name} is larger than 5MB`)
+        }
+        const imageRef = ref(storage, `products/${userData.uid}/${Date.now()}_${file.name}`)
+        await uploadBytes(imageRef, file)
+        return await getDownloadURL(imageRef)
+      })
+
+      const urls = await Promise.all(uploadPromises)
+      setFormData({ ...formData, images: [...formData.images, ...urls] })
+      toast.success(`${urls.length} image(s) uploaded successfully!`)
+    } catch (error: any) {
+      console.error('Error uploading images:', error)
+      toast.error(error.message || 'Failed to upload images')
+    } finally {
+      setUploadingImages(false)
+    }
+  }
+
+  const removeImage = (index: number) => {
+    setFormData({
+      ...formData,
+      images: formData.images.filter((_, i) => i !== index),
+    })
   }
 
   const resetForm = () => {
@@ -109,6 +146,7 @@ export default function ListingsPage() {
       customFilters: {},
       addOnServices: [],
       available: true,
+      images: [],
     })
   }
 
@@ -123,13 +161,13 @@ export default function ListingsPage() {
   }
 
   if (loading) {
-    return <div className="text-white">Loading...</div>
+    return <div className="text-gray-700">Loading...</div>
   }
 
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-4xl font-bold text-white">My Listings</h1>
+        <h1 className="text-4xl font-semibold text-gray-900">My Equipment</h1>
         <Button onClick={() => setShowForm(!showForm)}>
           <Plus className="mr-2" size={20} />
           {showForm ? 'Cancel' : 'Add New Listing'}
@@ -137,8 +175,8 @@ export default function ListingsPage() {
       </div>
 
       {showForm && (
-        <Card variant="glass" className="mb-8 p-8">
-          <h2 className="text-2xl font-bold text-white mb-6">
+        <Card variant="default" className="mb-8 p-8">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-6">
             {editingProduct ? 'Edit Product' : 'Create New Product'}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -195,32 +233,88 @@ export default function ListingsPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Description *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
               <textarea
-                className="w-full px-4 py-3 rounded-2xl glass border border-white/20 focus:outline-none focus:ring-2 focus:ring-primary text-white bg-transparent"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-gray-900 bg-white"
                 rows={4}
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 required
               />
             </div>
-            <Button type="submit" className="w-full" size="lg">
-              {editingProduct ? 'Update Product' : 'Create Product'}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Equipment Images</label>
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <label className="flex items-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:border-primary transition-colors">
+                    <Upload size={20} className="text-gray-400" />
+                    <span className="text-gray-600">Upload Images</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      disabled={uploadingImages}
+                    />
+                  </label>
+                  {uploadingImages && <span className="text-gray-500 text-sm">Uploading...</span>}
+                </div>
+                {formData.images.length > 0 && (
+                  <div className="grid grid-cols-4 gap-4">
+                    {formData.images.map((url, index) => (
+                      <div key={index} className="relative group">
+                        <Image
+                          src={url}
+                          alt={`Equipment image ${index + 1}`}
+                          width={150}
+                          height={150}
+                          className="w-full h-32 object-cover rounded-lg"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X size={16} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            <Button type="submit" className="w-full" size="lg" disabled={uploadingImages}>
+              {editingProduct ? 'Update Equipment' : 'Add Equipment'}
             </Button>
           </form>
         </Card>
       )}
 
       {products.length === 0 ? (
-        <Card variant="glass" className="text-center py-12">
-          <p className="text-gray-300 text-xl">No listings yet. Create your first listing!</p>
+        <Card variant="default" className="text-center py-12">
+          <p className="text-gray-600 text-xl">No equipment listed yet. Add your first equipment!</p>
         </Card>
       ) : (
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {products.map((product) => (
-            <Card key={product.id} variant="glass" className="p-6">
+            <Card key={product.id} variant="default" hover className="p-6">
+              {product.images && product.images.length > 0 ? (
+                <div className="relative h-48 mb-4 rounded-lg overflow-hidden">
+                  <Image
+                    src={product.images[0]}
+                    alt={product.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              ) : (
+                <div className="h-48 mb-4 rounded-lg bg-gray-100 flex items-center justify-center">
+                  <ImageIcon className="text-gray-400" size={48} />
+                </div>
+              )}
               <div className="flex justify-between items-start mb-4">
-                <h3 className="text-xl font-bold text-white">{product.title}</h3>
+                <h3 className="text-xl font-semibold text-gray-900">{product.title}</h3>
                 <button
                   onClick={() => toggleAvailability(product.id, product.available)}
                   className="text-gray-400 hover:text-primary"
@@ -228,14 +322,14 @@ export default function ListingsPage() {
                   {product.available ? <Eye size={20} /> : <EyeOff size={20} />}
                 </button>
               </div>
-              <p className="text-gray-400 text-sm mb-4 line-clamp-2">{product.description}</p>
+              <p className="text-gray-600 text-sm mb-4 line-clamp-2">{product.description}</p>
               <div className="flex justify-between items-center mb-4">
                 <div>
-                  <p className="text-2xl font-bold text-primary">{formatCurrency(product.dailyPrice)}</p>
-                  <p className="text-gray-400 text-sm">per day</p>
+                  <p className="text-2xl font-semibold text-primary">{formatCurrency(product.dailyPrice)}</p>
+                  <p className="text-gray-500 text-sm">per day</p>
                 </div>
-                <span className={`px-3 py-1 rounded-full text-sm ${
-                  product.available ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                <span className={`px-3 py-1 rounded-full text-sm border ${
+                  product.available ? 'bg-green-50 text-green-700 border-green-200' : 'bg-red-50 text-red-700 border-red-200'
                 }`}>
                   {product.available ? 'Available' : 'Unavailable'}
                 </span>
@@ -260,6 +354,7 @@ export default function ListingsPage() {
                       customFilters: product.customFilters || {},
                       addOnServices: product.addOnServices || [],
                       available: product.available,
+                      images: product.images || [],
                     })
                     setShowForm(true)
                   }}
