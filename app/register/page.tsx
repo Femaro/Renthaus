@@ -9,6 +9,7 @@ import Input from '@/components/ui/Input'
 import Card from '@/components/ui/Card'
 import { UserRole } from '@/lib/firebase/types'
 import toast from 'react-hot-toast'
+import Image from 'next/image'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -67,13 +68,21 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-secondary to-black flex items-center justify-center p-4">
-      <Card variant="glass" className="w-full max-w-md">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <Card variant="default" className="w-full max-w-md shadow-modern-lg">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">
-            Rent<span className="text-primary">Haus</span>
-          </h1>
-          <p className="text-gray-400">Create your account</p>
+          <div className="flex justify-center mb-6">
+            <Image 
+              src="/logo.png" 
+              alt="Renthaus Logo" 
+              width={200} 
+              height={67}
+              className="h-16 w-auto"
+              priority
+            />
+          </div>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-2">Create your account</h1>
+          <p className="text-gray-600">Join the Renthaus community</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -94,31 +103,31 @@ export default function RegisterPage() {
             required
           />
           <div>
-            <label className="block text-sm font-medium mb-2 text-secondary">
+            <label className="block text-sm font-medium mb-2 text-gray-700">
               I want to
             </label>
             <div className="flex gap-4">
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, role: 'customer' })}
-                className={`flex-1 py-3 rounded-2xl glass border-2 transition-all ${
+                className={`flex-1 py-3 rounded-xl border-2 transition-all ${
                   formData.role === 'customer'
-                    ? 'border-primary bg-primary/10'
-                    : 'border-white/20'
+                    ? 'border-primary bg-primary/5 text-primary'
+                    : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <span className="text-white font-medium">Rent Items</span>
+                <span className="font-medium">Rent Items</span>
               </button>
               <button
                 type="button"
                 onClick={() => setFormData({ ...formData, role: 'vendor' })}
-                className={`flex-1 py-3 rounded-2xl glass border-2 transition-all ${
+                className={`flex-1 py-3 rounded-xl border-2 transition-all ${
                   formData.role === 'vendor'
-                    ? 'border-primary bg-primary/10'
-                    : 'border-white/20'
+                    ? 'border-primary bg-primary/5 text-primary'
+                    : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
                 }`}
               >
-                <span className="text-white font-medium">List Items</span>
+                <span className="font-medium">List Items</span>
               </button>
             </div>
           </div>
@@ -146,10 +155,10 @@ export default function RegisterPage() {
         <div className="mt-6">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/20"></div>
+              <div className="w-full border-t border-gray-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-transparent text-gray-400">Or continue with</span>
+              <span className="px-2 bg-white text-gray-500">Or continue with</span>
             </div>
           </div>
 
@@ -164,8 +173,8 @@ export default function RegisterPage() {
         </div>
 
         <div className="mt-6 text-center text-sm">
-          <span className="text-gray-400">Already have an account? </span>
-          <Link href="/login" className="text-primary hover:underline">
+          <span className="text-gray-600">Already have an account? </span>
+          <Link href="/login" className="text-primary hover:underline font-medium">
             Sign in
           </Link>
         </div>

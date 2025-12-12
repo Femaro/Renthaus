@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Card from '@/components/ui/Card'
 import toast from 'react-hot-toast'
+import Image from 'next/image'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -44,13 +45,21 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-secondary to-black flex items-center justify-center p-4">
-      <Card variant="glass" className="w-full max-w-md">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <Card variant="default" className="w-full max-w-md shadow-modern-lg">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">
-            Rent<span className="text-primary">Haus</span>
-          </h1>
-          <p className="text-gray-400">Sign in to your account</p>
+          <div className="flex justify-center mb-6">
+            <Image 
+              src="/logo.png" 
+              alt="Renthaus Logo" 
+              width={200} 
+              height={67}
+              className="h-16 w-auto"
+              priority
+            />
+          </div>
+          <h1 className="text-2xl font-semibold text-gray-900 mb-2">Welcome back</h1>
+          <p className="text-gray-600">Sign in to your account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -78,10 +87,10 @@ export default function LoginPage() {
         <div className="mt-6">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-white/20"></div>
+              <div className="w-full border-t border-gray-200"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-transparent text-gray-400">Or continue with</span>
+              <span className="px-2 bg-white text-gray-500">Or continue with</span>
             </div>
           </div>
 
@@ -96,8 +105,8 @@ export default function LoginPage() {
         </div>
 
         <div className="mt-6 text-center text-sm">
-          <span className="text-gray-400">Don't have an account? </span>
-          <Link href="/register" className="text-primary hover:underline">
+          <span className="text-gray-600">Don't have an account? </span>
+          <Link href="/register" className="text-primary hover:underline font-medium">
             Sign up
           </Link>
         </div>
