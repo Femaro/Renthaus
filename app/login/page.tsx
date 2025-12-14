@@ -45,8 +45,39 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <Card variant="default" className="w-full max-w-md shadow-modern-lg">
+    <div className="min-h-screen bg-gray-50">
+      {/* Navigation Header */}
+      <nav className="bg-white/80 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            <Link href="/" className="flex items-center">
+              <Image 
+                src="/logo.png" 
+                alt="Renthaus Logo" 
+                width={180} 
+                height={60}
+                className="h-16 w-auto"
+                priority
+              />
+            </Link>
+            <div className="flex items-center gap-4">
+              <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium">
+                Home
+              </Link>
+              <Link href="/search" className="text-gray-700 hover:text-gray-900 font-medium">
+                Browse Equipment
+              </Link>
+              <Link href="/register">
+                <Button variant="outline" size="sm">Sign Up</Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Login Form */}
+      <div className="flex items-center justify-center p-4 min-h-[calc(100vh-80px)]">
+        <Card variant="default" className="w-full max-w-md shadow-modern-lg">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
             <Image 
@@ -111,6 +142,7 @@ export default function LoginPage() {
           </Link>
         </div>
       </Card>
+      </div>
     </div>
   )
 }

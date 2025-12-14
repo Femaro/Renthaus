@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
-import { Check, X } from 'lucide-react'
+import { Check, X, Home } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function PaymentCallbackPage() {
   const searchParams = useSearchParams()
@@ -38,8 +39,31 @@ export default function PaymentCallbackPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-black via-secondary to-black flex items-center justify-center p-4">
-      <Card variant="glass" className="max-w-md w-full p-8 text-center">
+    <div className="min-h-screen bg-gradient-to-br from-black via-secondary to-black">
+      {/* Navigation Header */}
+      <nav className="bg-black/50 backdrop-blur-xl border-b border-gray-800 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            <Link href="/" className="flex items-center">
+              <Image 
+                src="/logo.png" 
+                alt="Renthaus Logo" 
+                width={180} 
+                height={60}
+                className="h-16 w-auto"
+                priority
+              />
+            </Link>
+            <Link href="/" className="text-white hover:text-gray-300 font-medium flex items-center gap-1">
+              <Home size={18} />
+              Home
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      <div className="flex items-center justify-center p-4 min-h-[calc(100vh-80px)]">
+        <Card variant="glass" className="max-w-md w-full p-8 text-center">
         {status === 'loading' && (
           <>
             <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary mx-auto mb-4"></div>
