@@ -94,7 +94,26 @@ This guide will walk you through setting up the Renthaus application on a fresh 
 
 ## Environment Variables Setup
 
+### ⚠️ CRITICAL STEP: Environment Variables
+
+**The `.env.local` file is NOT included in Git for security reasons. You MUST create it manually on each new computer!**
+
 ### Step 6: Create Environment Variables File
+
+**Option 1: Copy from Template (Recommended)**
+
+1. In the project root directory (`Renthaus`), copy the example file:
+   ```bash
+   copy .env.example .env.local
+   ```
+   Or if using PowerShell:
+   ```powershell
+   Copy-Item .env.example .env.local
+   ```
+
+2. Open `.env.local` in a text editor (Notepad, VS Code, etc.)
+
+**Option 2: Create Manually**
 
 1. In the project root directory (`Renthaus`), create a new file named `.env.local`
    - **Using VS Code**: Right-click in the file explorer → New File → Name it `.env.local`
@@ -195,6 +214,19 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 ## Troubleshooting
 
+### ⚠️ Most Common Issue: Missing .env.local File
+
+**Error**: `Firebase: Error (auth/api-key-not-valid.-please-pass-a-valid-api-key.)`
+
+**Solution**:
+1. The `.env.local` file is NOT tracked by Git (for security)
+2. You MUST create it manually on each new computer
+3. Copy from template: `copy .env.example .env.local`
+4. Fill in your actual Firebase credentials (see Step 7)
+5. Restart the development server
+
+---
+
 ### Issue: "npm is not recognized"
 **Solution**: 
 - Restart your Command Prompt/PowerShell after installing Node.js
@@ -205,11 +237,20 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 - Delete `node_modules` folder and `package-lock.json`
 - Run `npm install` again
 
-### Issue: "Firebase: Error (auth/api-key-not-valid)"
+### Issue: "Firebase: Error (auth/api-key-not-valid)" or "api-key-not-valid"
 **Solution**: 
+- **MOST COMMON CAUSE**: The `.env.local` file is missing or not created!
+  - Make sure you've created `.env.local` in the project root directory
+  - Copy from `.env.example` if available: `copy .env.example .env.local`
+  - Check that the file is named exactly `.env.local` (not `.env.local.txt`)
 - Check that all Firebase environment variables in `.env.local` are correct
 - Make sure there are no extra spaces or quotes (except for `FIREBASE_PRIVATE_KEY`)
-- Restart the development server after changing `.env.local`
+- Verify you're using the correct Firebase project credentials
+- Restart the development server after changing `.env.local`:
+  ```bash
+  # Stop the server (Ctrl+C) and restart:
+  npm run dev
+  ```
 
 ### Issue: "Port 3000 is already in use"
 **Solution**: 

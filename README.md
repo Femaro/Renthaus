@@ -56,8 +56,15 @@ A niche-specific, multi-vendor online marketplace for event equipment rentals in
 npm install
 ```
 
-2. Set up environment variables:
-Create a `.env.local` file in the root directory with your Firebase and Paystack credentials (see Environment Variables section below).
+2. **⚠️ IMPORTANT: Set up environment variables:**
+   - The `.env.local` file is NOT tracked by Git (for security)
+   - You MUST create it manually on each new computer
+   - **Easiest way**: Copy from template:
+     ```bash
+     copy .env.example .env.local
+     ```
+   - Then fill in your actual Firebase and Paystack credentials (see Environment Variables section below)
+   - **Common Error**: If you see `Firebase: Error (auth/api-key-not-valid)`, you haven't created `.env.local` yet!
 
 3. Run the development server:
 ```bash
