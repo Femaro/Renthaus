@@ -40,17 +40,24 @@ A niche-specific, multi-vendor online marketplace for event equipment rentals in
 
 ## Getting Started
 
+### For New Setup (First Time)
+
+**📖 See [SETUP_GUIDE.md](./SETUP_GUIDE.md) for detailed step-by-step instructions** on setting up the app on a new computer, including:
+- Installing prerequisites (Git, Node.js, npm)
+- Cloning the repository
+- Setting up environment variables
+- Running the application
+- Troubleshooting common issues
+
+### Quick Start (If Already Set Up)
+
 1. Install dependencies:
 ```bash
 npm install
 ```
 
 2. Set up environment variables:
-```bash
-cp .env.example .env.local
-```
-
-Fill in your Firebase and Paystack credentials in `.env.local`.
+Create a `.env.local` file in the root directory with your Firebase and Paystack credentials (see Environment Variables section below).
 
 3. Run the development server:
 ```bash

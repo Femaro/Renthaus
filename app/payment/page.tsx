@@ -9,8 +9,10 @@ import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import { formatCurrency } from '@/lib/utils'
 import { useAuth } from '@/contexts/AuthContext'
-import { Shield, CreditCard } from 'lucide-react'
+import { Shield, CreditCard, ArrowLeft, Home, Search } from 'lucide-react'
 import toast from 'react-hot-toast'
+import Link from 'next/link'
+import Image from 'next/image'
 
 export default function PaymentPage() {
   const searchParams = useSearchParams()
@@ -99,9 +101,44 @@ export default function PaymentPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-      <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-6 md:mb-8">Complete Payment</h1>
+    <div className="min-h-screen bg-gray-50">
+      {/* Navigation Header */}
+      <nav className="bg-white/80 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            <Link href="/" className="flex items-center">
+              <Image 
+                src="/logo.png" 
+                alt="Renthaus Logo" 
+                width={180} 
+                height={60}
+                className="h-16 w-auto"
+                priority
+              />
+            </Link>
+            <div className="flex items-center gap-4">
+              <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium flex items-center gap-1">
+                <Home size={18} />
+                Home
+              </Link>
+              <Link href="/search" className="text-gray-700 hover:text-gray-900 font-medium flex items-center gap-1">
+                <Search size={18} />
+                Browse
+              </Link>
+              {order && (
+                <Link href={`/products/${order.productId}`} className="text-gray-700 hover:text-gray-900 font-medium flex items-center gap-1">
+                  <ArrowLeft size={18} />
+                  Back to Product
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="p-4 md:p-8">
+        <div className="max-w-2xl mx-auto">
+          <h1 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-6 md:mb-8">Complete Payment</h1>
 
         <Card variant="default" className="p-8 mb-6 bg-primary/5 border-primary/20">
           <div className="flex items-center gap-3 mb-6">
@@ -144,6 +181,8 @@ export default function PaymentPage() {
           <CreditCard className="mr-2" size={20} />
           {processing ? 'Processing...' : 'Pay with Paystack'}
         </Button>
+      </div>
+        </div>
       </div>
     </div>
   )

@@ -11,6 +11,9 @@ import Input from '@/components/ui/Input'
 import { formatCurrency } from '@/lib/utils'
 import { useAuth } from '@/contexts/AuthContext'
 import toast from 'react-hot-toast'
+import Link from 'next/link'
+import Image from 'next/image'
+import { ArrowLeft, Home, Search } from 'lucide-react'
 
 export default function CheckoutPage() {
   const searchParams = useSearchParams()
@@ -142,9 +145,44 @@ export default function CheckoutPage() {
   const total = rentalFee + securityDeposit
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-6 md:mb-8">Checkout</h1>
+    <div className="min-h-screen bg-gray-50">
+      {/* Navigation Header */}
+      <nav className="bg-white/80 backdrop-blur-xl border-b border-gray-100 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            <Link href="/" className="flex items-center">
+              <Image 
+                src="/logo.png" 
+                alt="Renthaus Logo" 
+                width={180} 
+                height={60}
+                className="h-16 w-auto"
+                priority
+              />
+            </Link>
+            <div className="flex items-center gap-4">
+              <Link href="/" className="text-gray-700 hover:text-gray-900 font-medium flex items-center gap-1">
+                <Home size={18} />
+                Home
+              </Link>
+              <Link href="/search" className="text-gray-700 hover:text-gray-900 font-medium flex items-center gap-1">
+                <Search size={18} />
+                Browse
+              </Link>
+              {product && (
+                <Link href={`/products/${product.id}`} className="text-gray-700 hover:text-gray-900 font-medium flex items-center gap-1">
+                  <ArrowLeft size={18} />
+                  Back to Product
+                </Link>
+              )}
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      <div className="p-4 md:p-8">
+        <div className="max-w-4xl mx-auto">
+          <h1 className="text-3xl md:text-4xl font-semibold text-gray-900 mb-6 md:mb-8">Checkout</h1>
 
         <div className="grid lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 space-y-6">
@@ -260,6 +298,7 @@ export default function CheckoutPage() {
             </Card>
           </div>
         </div>
+      </div>
       </div>
     </div>
   )
